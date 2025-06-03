@@ -62,7 +62,7 @@ function FloatingIcons() {
 
 export default function AboutUsHero() {
   return (
-    <div className="relative h-screen overflow-hidden bg-gray-50">
+    <div className="relative h-screen overflow-hidden bg-gray-50 my-6">
       {/* Three.js Background Layer */}
       <div className="absolute inset-0 z-0 opacity-20">
         <Canvas>
