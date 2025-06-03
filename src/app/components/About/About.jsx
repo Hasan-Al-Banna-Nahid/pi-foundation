@@ -76,7 +76,7 @@ export default function AboutUsHero() {
       {/* Main Content */}
       <div className="relative z-10 h-full flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-24">
         {/* Left Column - Text Content */}
-        <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
+        <div className="lg:w-1/2 space-y-8 text-center lg:text-left my-6">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
             We Believe That We
             <br />
