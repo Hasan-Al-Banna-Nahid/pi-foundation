@@ -80,7 +80,7 @@ function FloatingCards() {
 
 export default function AboutUsHero() {
   return (
-    <div className="relative h-screen my-8 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="relative my-8 h-screen my-8 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Three.js Background Layer */}
       <div className="absolute inset-0 z-0 opacity-20">
         <Canvas>

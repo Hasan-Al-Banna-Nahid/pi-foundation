@@ -256,7 +256,7 @@ function FloatingCommunity() {
         anchorY="middle"
       >
         Community Support
-        <meshStandardMaterial emissive="#f59e0b" emissiveIntensity={1} />
+        <meshStandardMaterial emissive="#f59c7b" emissiveIntensity={1} />
       </Text>
     </group>
   );
