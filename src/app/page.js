@@ -1,6 +1,8 @@
 import AboutUsHero from "./components/About/About";
 import AnimatedBanners from "./components/Banner/Banner";
+import CampaignSlider from "./components/Campaign/Campaign";
 import Service from "./components/Service/Service";
+import VolunteerComponent from "./components/VolunteerScene/VolunteerScene";
 
 export default function Home() {
   return (
@@ -8,6 +10,8 @@ export default function Home() {
       <AnimatedBanners />
       <Service />
       <AboutUsHero />
+      <VolunteerComponent />
+      <CampaignSlider />
     </div>
   );
 }

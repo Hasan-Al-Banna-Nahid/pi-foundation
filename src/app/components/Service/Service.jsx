@@ -173,7 +173,7 @@ export default function HumanistServices() {
         </div>
 
         {/* Testimonial Section */}
-        <div className="mt-24 bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
+        {/* <div className="mt-24 bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
           <blockquote className="text-center">
             <p className="text-xl italic text-gray-700 mb-4">
               "The support we received transformed our community. Children now
@@ -184,14 +184,14 @@ export default function HumanistServices() {
               — Maria G., Community Leader
             </footer>
           </blockquote>
-        </div>
+        </div> */}
         <div className="mt-24 bg-white rounded-xl shadow-lg p-8 max-w-4xl mx-auto">
           <blockquote className="text-center">
             <p className="text-xl italic text-gray-700 mb-4">
               "Togethers We Can Make Changes"
             </p>
             <footer className="text-gray-600">
-              — Hasan Al Banna Nahid., Founder,Pi Foundation.
+              — Hasan Al Banna Nahid. Founder,Pi Foundation.
             </footer>
           </blockquote>
         </div>
