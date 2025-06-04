@@ -4,6 +4,7 @@ import CampaignSlider from "./components/Campaign/Campaign";
 import CharityHero from "./components/CharityHero/CharityHero";
 import OpenDoorsComponent from "./components/OpenDoor/OpenDoor";
 import Service from "./components/Service/Service";
+import SuccessStoryComponent from "./components/successStrory/successStrory";
 import VolunteerComponent from "./components/VolunteerScene/VolunteerScene";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
       <CampaignSlider />
       <OpenDoorsComponent />
       <CharityHero />
+      <SuccessStoryComponent />
     </div>
   );
 }
