@@ -80,7 +80,7 @@ function FloatingCards() {
 
 export default function AboutUsHero() {
   return (
-    <div className="relative h-screen my-8 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="relative min-h-screen my-4 sm:my-8 overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Three.js Background Layer */}
       <div className="absolute inset-0 z-0 opacity-20">
         <Canvas>
@@ -98,10 +98,10 @@ export default function AboutUsHero() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 h-full my-8 flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-24 gap-12">
+      <div className="relative z-10 min-h-screen flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-12 gap-8 sm:gap-12">
         {/* Left Column - Text Content */}
-        <div className="lg:w-1/2 my-8 space-y-8 text-center lg:text-left">
-          <h1 className="text-4xl mt-6 sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+        <div className="w-full lg:w-1/2 my-8 space-y-6 text-center lg:text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
             We Believe That We
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-600 animate-gradient">
@@ -111,14 +111,14 @@ export default function AboutUsHero() {
             With You
           </h1>
 
-          <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto lg:mx-0">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-full sm:max-w-2xl mx-auto lg:mx-0">
             Donet is the largest global crowdfunding community connecting
             nonprofits, donors, and companies in nearly every country. We help
             nonprofits from Bangladesh access the tools they need to make our
             country better.
           </p>
 
-          <div className="grid mb-24 grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-4 max-w-xs sm:max-w-md mx-auto lg:mx-0">
             {[
               {
                 name: "Education",
@@ -143,45 +143,23 @@ export default function AboutUsHero() {
             ].map((item) => (
               <div
                 key={item.name}
-                className={`bg-gradient-to-br ${item.color} p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/20`}
+                className={`bg-gradient-to-br ${item.color} p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/20`}
               >
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">{item.icon}</span>
-                  <span className="text-white font-medium">{item.name}</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-xl sm:text-2xl">{item.icon}</span>
+                  <span className="text-white font-medium text-sm sm:text-base">
+                    {item.name}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
-
-          {/* <div className="flex  mt-2 flex-col sm:flex-row gap-4">
-            <button className="mt-6 px-8 py-3 bg-gradient-to-r from-green-500 to-blue-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 group">
-              <span className="relative -bottom-4 z-10">About More</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-green-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </button>
-            <button className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 group">
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Join Our Mission
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </span>
-            </button>
-          </div> */}
         </div>
 
         {/* Right Column - Image Layer */}
-        <div className="lg:w-1/2 relative h-full flex items-center justify-center">
+        <div className="w-full lg:w-1/2 flex items-center justify-center">
           {/* Image with Glass Card */}
-          <div className="relative w-full max-w-lg h-96 rounded-3xl overflow-hidden shadow-2xl group">
+          <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg h-64 sm:h-80 md:h-96 rounded-3xl overflow-hidden shadow-2xl group">
             <Image
               src="/smile.webp"
               alt="Community helping together"
@@ -192,39 +170,20 @@ export default function AboutUsHero() {
             />
 
             {/* Image overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent hidden lg:block"></div>
 
-            {/* Glass Card */}
-            <div className="absolute -bottom-6 -right-6 backdrop-blur-md bg-white/90 p-6 rounded-xl shadow-xl w-3/4 border-l-4 border-green-500 transform rotate-1 hover:rotate-0 transition-transform duration-300">
+            {/* Glass Card - Hidden on mobile */}
+            <div className="absolute -bottom-4 -right-4 lg:-bottom-6 lg:-right-6 backdrop-blur-md bg-white/90 p-4 sm:p-6 rounded-xl shadow-xl w-3/4 lg:w-3/4 border-l-4 border-green-500 transform rotate-1 hover:rotate-0 transition-transform duration-300 hidden lg:block">
               <div className="flex items-center space-x-2">
-                <div className="text-gray-600 text-sm font-medium">
-                  Countries reached with our programs
+                <div className="text-gray-600 text-xs sm:text-sm font-medium">
+                  Country will reach with our programs
                 </div>
               </div>
             </div>
 
-            {/* Stats Glass Panel */}
-            {/* <div className="absolute top-48 -left-12 z-50 backdrop-blur-md bg-white/80 p-4 rounded-xl shadow-lg border border-white/20">
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { value: "10K+", label: "Lives" },
-                  { value: "50+", label: "Communities" },
-                  { value: "100%", label: "Transparency" },
-                  { value: "24/7", label: "Support" },
-                ].map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <p className="text-lg font-bold text-gray-800">
-                      {stat.value}
-                    </p>
-                    <p className="text-xs text-gray-600">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div> */}
-
-            {/* Decorative Elements */}
-            <div className="absolute -top-6 -left-6 w-24 h-24 bg-blue-500/20 rounded-full backdrop-blur-sm animate-float"></div>
-            <div className="absolute bottom-8 -right-8 w-20 h-20 bg-green-500/20 rounded-full backdrop-blur-sm animate-float-delay"></div>
+            {/* Decorative Elements - Hidden on mobile */}
+            <div className="absolute -top-4 -left-4 lg:-top-6 lg:-left-6 w-16 sm:w-20 lg:w-24 h-16 sm:h-20 lg:h-24 bg-blue-500/20 rounded-full backdrop-blur-sm animate-float hidden lg:block"></div>
+            <div className="absolute bottom-6 -right-6 lg:bottom-8 lg:-right-8 w-14 sm:w-16 lg:w-20 h-14 sm:h-16 lg:h-20 bg-green-500/20 rounded-full backdrop-blur-sm animate-float-delay hidden lg:block"></div>
           </div>
         </div>
       </div>
