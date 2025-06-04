@@ -101,7 +101,7 @@ export default function AboutUsHero() {
       <div className="relative z-10 h-full my-8 flex flex-col lg:flex-row items-center justify-center px-6 sm:px-12 lg:px-24 gap-12">
         {/* Left Column - Text Content */}
         <div className="lg:w-1/2 my-8 space-y-8 text-center lg:text-left">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-4xl mt-6 sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
             We Believe That We
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-blue-600 animate-gradient">
