@@ -1,251 +1,204 @@
 "use client";
-import { useRef, useMemo, useState } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Text, Float, useGLTF } from "@react-three/drei";
+import { useRef, useEffect } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Float, Text } from "@react-three/drei";
 import * as THREE from "three";
+import gsap from "gsap";
+import { motion } from "framer-motion";
 
-function VolunteerScene() {
-  const lightRef = useRef();
-  const secondaryLightRef = useRef();
-  const groupRef = useRef();
-  const { camera } = useThree();
+// 3D Floating Object Component
+function FloatingHeart({ position }) {
+  const meshRef = useRef();
 
-  // Create particle system with enhanced sparkling effect
-  const particles = useMemo(() => {
-    const particlesGeometry = new THREE.BufferGeometry();
-    const count = 1000; // Increased particle count for richer effect
-
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    const scales = new Float32Array(count);
-
-    for (let i = 0; i < count * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 12; // Wider spread
-      colors[i] = Math.random();
-      scales[i] = Math.random() * 0.05 + 0.05; // Vary particle size
-    }
-
-    particlesGeometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(positions, 3)
-    );
-    particlesGeometry.setAttribute(
-      "color",
-      new THREE.BufferAttribute(colors, 3)
-    );
-    particlesGeometry.setAttribute(
-      "scale",
-      new THREE.BufferAttribute(scales, 1)
-    );
-
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.15,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.7,
-      sizeAttenuation: true,
-      blending: THREE.AdditiveBlending, // Sparkling effect
-    });
-
-    return new THREE.Points(particlesGeometry, particlesMaterial);
-  }, []);
-
-  // 3D Icons for Volunteer Benefits
-  const icons = useMemo(
-    () => [
-      {
-        position: [2, 0, 0],
-        geometry: new THREE.BoxGeometry(0.3, 0.3, 0.05), // Book for resources
-        material: new THREE.MeshStandardMaterial({ color: "#4f46e5" }),
-        name: "resources",
-      },
-      {
-        position: [-2, 0, 0],
-        geometry: new THREE.SphereGeometry(0.2, 16, 16), // Sphere for community
-        material: new THREE.MeshStandardMaterial({ color: "#10b981" }),
-        name: "community",
-      },
-      {
-        position: [0, 0, 2],
-        geometry: new THREE.BoxGeometry(0.3, 0.05, 0.3), // Cap for training
-        material: new THREE.MeshStandardMaterial({ color: "#4f46e5" }),
-        name: "training",
-      },
-      {
-        position: [0, 0, -2],
-        geometry: new THREE.SphereGeometry(0.2, 16, 16), // Heart-like for impact
-        material: new THREE.MeshStandardMaterial({ color: "#10b981" }),
-        name: "impact",
-      },
-    ],
-    []
-  );
-
-  // Animation and interactivity
-  const [hovered, setHovered] = useState(null);
-
-  useFrame(({ clock, mouse }) => {
-    const time = clock.getElapsedTime();
-
-    // Animate lights
-    lightRef.current.position.x = Math.sin(time) * 2.5;
-    lightRef.current.position.z = Math.cos(time) * 2.5;
-    secondaryLightRef.current.position.x = Math.cos(time * 0.5) * 3;
-    secondaryLightRef.current.position.z = Math.sin(time * 0.5) * 3;
-
-    // Animate particles
-    particles.rotation.y += 0.001;
-    particles.rotation.x += 0.0005;
-
-    // Animate icons
-    icons.forEach((icon, i) => {
-      const mesh = groupRef.current.children[i];
-      mesh.position.y += Math.sin(time + i) * 0.01; // Float effect
-      mesh.rotation.y += 0.02; // Rotate icons
-      if (hovered === icon.name) {
-        mesh.scale.set(1.2, 1.2, 1.2); // Scale up on hover
-      } else {
-        mesh.scale.set(1, 1, 1);
-      }
-    });
-
-    // Subtle camera animation
-    camera.position.z = 5 + Math.sin(time * 0.2) * 0.5; // Gentle zoom
+  useFrame(({ clock }) => {
+    meshRef.current.rotation.x = Math.sin(clock.getElapsedTime()) * 0.2;
+    meshRef.current.rotation.y = Math.cos(clock.getElapsedTime() * 0.5) * 0.3;
+    meshRef.current.position.y = Math.sin(clock.getElapsedTime() * 1.5) * 0.2;
   });
 
   return (
-    <>
-      <ambientLight intensity={0.3} />
-      <pointLight
-        ref={lightRef}
-        position={[2, 2, 2]}
-        intensity={2}
-        color="#4f46e5"
-        distance={12}
-        decay={1.5}
-      />
-      <pointLight
-        ref={secondaryLightRef}
-        position={[-2, -2, -2]}
-        intensity={1.5}
-        color="#10b981"
-        distance={12}
-        decay={1.5}
-      />
-
-      <Float speed={2} rotationIntensity={1} floatIntensity={2}>
-        <Text
-          font="/fonts/Inter-Bold.ttf"
-          fontSize={0.8}
-          color="#ffffff"
-          position={[0, 1.5, 0]}
-          anchorX="center"
-          anchorY="middle"
-        >
-          Become a Volunteer
-          <meshStandardMaterial emissive="#4f46e5" emissiveIntensity={2.5} />
-        </Text>
-      </Float>
-
-      <primitive object={particles} />
-
-      <group ref={groupRef}>
-        {icons.map((icon, index) => (
-          <mesh
-            key={index}
-            geometry={icon.geometry}
-            material={icon.material}
-            position={icon.position}
-            onPointerOver={() => setHovered(icon.name)}
-            onPointerOut={() => setHovered(null)}
-          />
-        ))}
-      </group>
-    </>
+    <Float speed={3} rotationIntensity={0.5} floatIntensity={1}>
+      <mesh ref={meshRef} position={position}>
+        <sphereGeometry args={[0.5, 32, 32]} />
+        <meshStandardMaterial
+          color="#ef4444"
+          emissive="#ef4444"
+          emissiveIntensity={0.5}
+          roughness={0.3}
+          metalness={0.7}
+        />
+      </mesh>
+    </Float>
   );
 }
 
-export default function VolunteerComponent() {
+// Charity Card Component
+const CharityCard = ({
+  title,
+  description,
+  progress,
+  goal,
+  raised,
+  color,
+  index,
+}) => {
+  const cardRef = useRef();
+  const percentage = Math.min(Math.round((raised / goal) * 100), 100);
+
+  useEffect(() => {
+    // GSAP animation for card entrance
+    gsap.from(cardRef.current, {
+      opacity: 0,
+      y: 50,
+      duration: 0.8,
+      delay: index * 0.15,
+      ease: "power3.out",
+    });
+
+    // Continuous floating effect
+    gsap.to(cardRef.current, {
+      y: 10,
+      duration: 3,
+      yoyo: true,
+      repeat: -1,
+      ease: "sine.inOut",
+    });
+  }, [index]);
+
   return (
-    <div className="relative my-8 h-[600px] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Three.js Canvas */}
-      <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-          <VolunteerScene />
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={0.3}
-          />
-        </Canvas>
-      </div>
-
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col lg:flex-row items-center justify-center px-8 gap-12">
-        {/* Left Column */}
-        <div className="lg:w-1/2 space-y-8 text-center lg:text-left">
-          <div className="inline-block bg-gradient-to-r from-purple-600 to-emerald-500 p-1 rounded-lg mb-6">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white bg-gray-900 px Grown px-6 py-3 rounded-lg">
-              Join Our Movement
-            </h2>
-          </div>
-
-          <p className="text-lg text-gray-300 max-w-2xl">
-            Provide resources such as reports, infographics, and educational
-            materials related to our cause. Help us make a difference in
-            communities worldwide.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
-            <button className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 group relative overflow-hidden border-2 border-purple-400/30">
-              <span className="relative z-10">Learn More</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </button>
-
-            <button className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105 group relative overflow-hidden border-2 border-emerald-400/30">
-              <span className="relative z-10">Join Us Now</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-teal-600 to-emerald-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-            </button>
-          </div>
+    <motion.div
+      ref={cardRef}
+      whileHover={{ scale: 1.03 }}
+      className={`relative overflow-hidden rounded-2xl shadow-2xl ${color} p-0.5 h-full`}
+    >
+      <div className="relative h-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6">
+        {/* 3D Object Container */}
+        <div className="absolute -top-10 -right-10 w-40 h-40">
+          <Canvas>
+            <ambientLight intensity={0.5} />
+            <pointLight position={[10, 10, 10]} intensity={1} />
+            <FloatingHeart position={[0, 0, 2]} />
+          </Canvas>
         </div>
 
-        {/* Right Column */}
-        <div className="lg:w-1/2 relative h-full flex items-center justify-center">
-          <div className="relative w-full max-w-md h-80 bg-white/10 backdrop-blur-lg rounded-2xl border-2 border-white/20 p-8 shadow-2xl overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full filter blur-3xl"></div>
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-emerald-500/20 rounded-full filter blur-3xl"></div>
+        {/* Glow Effect */}
+        <div
+          className={`absolute -top-20 -right-20 w-40 h-40 rounded-full filter blur-3xl ${color.replace(
+            "bg-gradient-to-r",
+            "bg-gradient-to-br"
+          )} opacity-30`}
+        ></div>
 
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Volunteer Benefits
-            </h3>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start">
-                <div className="flex-shrink-0 mt-1 mr-3 text-emerald-400">
-                  ✓
-                </div>
-                <span>Access to exclusive resources</span>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 mt-1 mr-3 text-emerald-400">
-                  ✓
-                </div>
-                <span>Community of like-minded people</span>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 mt-1 mr-3 text-emerald-400">
-                  ✓
-                </div>
-                <span>Training and development</span>
-              </li>
-              <li className="flex items-start">
-                <div className="flex-shrink-0 mt-1 mr-3 text-emerald-400">
-                  ✓
-                </div>
-                <span>Make a tangible impact</span>
-              </li>
-            </ul>
+        {/* Content */}
+        <div className="relative z-10 h-full flex flex-col">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">{title}</h3>
+          <p className="text-gray-600 mb-4">{description}</p>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+            <motion.div
+              className="h-2.5 rounded-full bg-gradient-to-r from-green-400 to-blue-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${percentage}%` }}
+              transition={{ duration: 1.5, delay: index * 0.2 }}
+            />
           </div>
+
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-sm font-medium text-gray-700">
+              Raised: ${raised.toLocaleString()}
+            </span>
+            <span className="text-sm font-medium text-gray-700">
+              Goal: ${goal.toLocaleString()}
+            </span>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="mt-auto px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
+          >
+            Donate Now
+          </motion.button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// Main Component
+export default function CharityCardSeries() {
+  const containerRef = useRef();
+  const cards = [
+    {
+      id: 1,
+      title: "Food for All",
+      description: "Providing meals to underprivileged communities worldwide",
+      raised: 86210,
+      goal: 100000,
+      color: "bg-gradient-to-r from-amber-500 to-orange-500",
+      progress: 86,
+    },
+    {
+      id: 2,
+      title: "Medical Relief",
+      description: "Healthcare access for remote communities",
+      raised: 69628,
+      goal: 120000,
+      color: "bg-gradient-to-r from-emerald-500 to-teal-600",
+      progress: 58,
+    },
+    {
+      id: 3,
+      title: "Education Fund",
+      description: "Building schools and providing learning materials",
+      raised: 45000,
+      goal: 80000,
+      color: "bg-gradient-to-r from-blue-500 to-indigo-600",
+      progress: 56,
+    },
+    {
+      id: 4,
+      title: "Clean Water",
+      description: "Sustainable water solutions for arid regions",
+      raised: 92300,
+      goal: 150000,
+      color: "bg-gradient-to-r from-cyan-500 to-sky-600",
+      progress: 62,
+    },
+  ];
+
+  // GSAP animation for container
+  useEffect(() => {
+    gsap.from(containerRef.current, {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+  }, []);
+
+  return (
+    <div className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-4">
+          Our Charity Programs
+        </h2>
+        <p className="text-xl text-center text-gray-600 max-w-3xl mx-auto mb-12">
+          Join us in making a difference through these impactful initiatives
+        </p>
+
+        <div
+          ref={containerRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {cards.map((card, index) => (
+            <CharityCard key={card.id} index={index} {...card} />
+          ))}
         </div>
       </div>
     </div>
