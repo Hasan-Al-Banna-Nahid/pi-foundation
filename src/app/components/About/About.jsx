@@ -118,7 +118,7 @@ export default function AboutUsHero() {
             country better.
           </p>
 
-          <div className="grid mb-12 grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
+          <div className="grid mb-24 grid-cols-2 gap-4 max-w-md mx-auto lg:mx-0">
             {[
               {
                 name: "Education",
