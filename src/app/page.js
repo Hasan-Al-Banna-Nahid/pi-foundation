@@ -8,6 +8,8 @@ import OpenDoorsComponent from "./components/OpenDoor/OpenDoor";
 import RecentProjects from "./components/RecentProgramm/RecentProgramm";
 import Service from "./components/Service/Service";
 import VolunteerComponent from "./components/VolunteerScene/VolunteerScene";
+import NewsSection from "./components/Blog/Blog";
+import Footer from "./components/Footer/Footer";
 
 export default function Home() {
   return (
@@ -23,6 +25,8 @@ export default function Home() {
       {/* <RecentProjects /> */}
       <SuccessStoryComponent />
       <RecentProjects />
+      <NewsSection />
+      <Footer />
     </div>
   );
 }
