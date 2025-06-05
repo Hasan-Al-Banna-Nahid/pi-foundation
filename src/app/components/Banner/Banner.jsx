@@ -307,11 +307,11 @@ export default function AnimatedBanners() {
           link: "/donate",
           bgColor: "bg-gradient-to-r from-red-600 to-purple-700",
         },
-        {
-          text: "Volunteer as Medic",
-          link: "/volunteer",
-          bgColor: "bg-gradient-to-r from-purple-600 to-blue-700",
-        },
+        // {
+        //   text: "Volunteer as Medic",
+        //   link: "/volunteer",
+        //   bgColor: "bg-gradient-to-r from-purple-600 to-blue-700",
+        // },
       ],
       stats: [
         { value: "10,000+", label: "Lives Saved" },
