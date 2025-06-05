@@ -222,17 +222,18 @@ function BannerSlide({ bgImage, themeColor, title, subtitle, stats, buttons }) {
       <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4 sm:px-6 lg:px-8">
         <div className="bg-black/20 backdrop-blur-md rounded-xl p-4 sm:p-6 max-w-3xl mx-auto">
           <animated.h1
-            style={titleProps}
+            style={{ ...titleProps, textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
             className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white mb-4 font-serif leading-tight"
-            style={{ textShadow: "0 2px 4px rgba(0,0,0,0.5)" }}
           >
             {title}
           </animated.h1>
 
           <animated.p
-            style={subtitleProps}
+            style={{
+              ...subtitleProps,
+              textShadow: "0 1px 3px rgba(0,0,0,0.4)",
+            }}
             className="text-base sm:text-lg lg:text-xl text-white max-w-2xl mb-6 font-sans"
-            style={{ textShadow: "0 1px 3px rgba(0,0,0,0.4)" }}
           >
             {subtitle}
           </animated.p>
