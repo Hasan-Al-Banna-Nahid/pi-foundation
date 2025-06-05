@@ -1,110 +1,75 @@
 "use client";
-import { useRef, useMemo, useState, useEffect } from "react";
+import { useRef, useEffect, forwardRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, Float, Text } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Float, Text } from "@react-three/drei";
 import * as THREE from "three";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useSpring, animated } from "@react-spring/web";
+import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/navigation";
 
-function CampaignScene({ category, hexColor }) {
-  const lightRef = useRef();
-  const { camera } = useThree();
+gsap.registerPlugin(ScrollTrigger);
 
-  // Map Tailwind classes to hex colors for particles
-  const colorMap = {
-    "from-amber-500": "#f59e0b",
-    "from-emerald-500": "#10b981",
-    "from-blue-500": "#3b82f6",
-    "from-purple-500": "#8b5cf6",
-    "from-indigo-500": "#4f46e5",
-    "from-green-500": "#22c55e",
-  };
+const HandGivingScene = () => {
+  const groupRef = useRef();
+  const particlesRef = useRef();
+  const handsRef = useRef([]);
+  const cloudRef = useRef();
+  const cloudCount = 8;
 
-  // Define category-specific icons
-  const icons = useMemo(() => {
-    const iconConfigs = {
-      Food: {
-        geometry: new THREE.ConeGeometry(0.2, 0.4, 8), // Fork-like shape
-        material: new THREE.MeshStandardMaterial({
-          color: "#f59e0b",
-          emissive: "#f59e0b",
-          emissiveIntensity: 0.5,
-        }),
-        position: [0, 0, 0],
-      },
-      Treatment: {
-        geometry: new THREE.BoxGeometry(0.3, 0.05, 0.3), // Cross-like shape
-        material: new THREE.MeshStandardMaterial({
-          color: "#10b981",
-          emissive: "#10b981",
-          emissiveIntensity: 0.5,
-        }),
-        position: [-0.5, 0, 0.5],
-      },
-      Development: {
-        geometry: new THREE.SphereGeometry(0.2, 16, 16), // Globe-like shape
-        material: new THREE.MeshStandardMaterial({
-          color: "#3b82f6",
-          emissive: "#3b82f6",
-          emissiveIntensity: 0.5,
-        }),
-        position: [0.5, 0, -0.5],
-      },
-      Education: {
-        geometry: new THREE.BoxGeometry(0.3, 0.3, 0.05), // Book shape
-        material: new THREE.MeshStandardMaterial({
-          color: "#8b5cf6",
-          emissive: "#8b5cf6",
-          emissiveIntensity: 0.5,
-        }),
-        position: [-0.5, 0, -0.5],
-      },
-      Employment: {
-        geometry: new THREE.CylinderGeometry(0.15, 0.15, 0.3, 16), // Briefcase-like
-        material: new THREE.MeshStandardMaterial({
-          color: "#4f46e5",
-          emissive: "#4f46e5",
-          emissiveIntensity: 0.5,
-        }),
-        position: [0.5, 0, 0.5],
-      },
-      Environment: {
-        geometry: new THREE.SphereGeometry(0.2, 16, 16), // Leaf-like sphere
-        material: new THREE.MeshStandardMaterial({
-          color: "#22c55e",
-          emissive: "#22c55e",
-          emissiveIntensity: 0.5,
-        }),
-        position: [0, 0, 0],
-      },
-    };
-    return [iconConfigs[category]];
-  }, [category]);
-
-  // Particle system for subtle background effect
-  const particles = useMemo(() => {
-    const particlesGeometry = new THREE.BufferGeometry();
-    const count = 150;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-
-    // Use hexColor or fallback to white
-    const particleColor = hexColor
-      ? new THREE.Color(hexColor)
-      : new THREE.Color("#ffffff");
-
-    for (let i = 0; i < count * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * 4;
-      colors[i] =
-        i % 3 === 0
-          ? particleColor.r
-          : i % 3 === 1
-          ? particleColor.g
-          : particleColor.b;
+  useEffect(() => {
+    // Initialize cloud particles
+    const cloudGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+    const cloudMaterial = new THREE.MeshStandardMaterial({
+      color: "#ffffff",
+      transparent: true,
+      opacity: 0.2,
+      roughness: 0.8,
+    });
+    for (let i = 0; i < cloudCount; i++) {
+      const cloud = new THREE.Mesh(cloudGeometry, cloudMaterial);
+      cloud.position.set(
+        (Math.random() - 0.5) * 10,
+        Math.random() * 4,
+        (Math.random() - 0.5) * 10
+      );
+      cloud.scale.setScalar(0.4 + Math.random() * 0.3);
+      cloudRef.current.add(cloud);
     }
 
+    // Initialize hand models (simplified as cones)
+    const handGeometry = new THREE.ConeGeometry(0.15, 0.5, 8);
+    const handMaterial = new THREE.MeshStandardMaterial({
+      color: "#FFD700",
+      emissive: "#FFD700",
+      emissiveIntensity: 0.3,
+      roughness: 0.4,
+    });
+    for (let i = 0; i < 5; i++) {
+      const hand = new THREE.Mesh(handGeometry, handMaterial);
+      hand.position.set(
+        (Math.random() - 0.5) * 8,
+        -2 + Math.random() * 1,
+        (Math.random() - 0.5) * 8
+      );
+      hand.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      handsRef.current.push(hand);
+      groupRef.current.add(hand);
+    }
+
+    // Initialize particles
+    const particlesGeometry = new THREE.BufferGeometry();
+    const count = 200;
+    const positions = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 15;
+      colors[i] = 0.5 + Math.random() * 0.5;
+    }
     particlesGeometry.setAttribute(
       "position",
       new THREE.BufferAttribute(positions, 3)
@@ -113,255 +78,281 @@ function CampaignScene({ category, hexColor }) {
       "color",
       new THREE.BufferAttribute(colors, 3)
     );
-
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.08,
+      size: 0.05,
       vertexColors: true,
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.8,
       blending: THREE.AdditiveBlending,
     });
+    particlesRef.current = new THREE.Points(
+      particlesGeometry,
+      particlesMaterial
+    );
+    groupRef.current.add(particlesRef.current);
 
-    return new THREE.Points(particlesGeometry, particlesMaterial);
-  }, [hexColor]);
-
-  const [hovered, setHovered] = useState(false);
+    return () => {
+      cloudGeometry.dispose();
+      cloudMaterial.dispose();
+      handGeometry.dispose();
+      handMaterial.dispose();
+      particlesGeometry.dispose();
+      particlesMaterial.dispose();
+    };
+  }, []);
 
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
-    lightRef.current.position.x = Math.sin(time) * 1.5;
-    lightRef.current.position.z = Math.cos(time) * 1.5;
-    particles.rotation.y += 0.002;
-    camera.position.z = 2.5 + Math.sin(time * 0.3) * 0.2;
+    groupRef.current.rotation.y = time * 0.02;
+    particlesRef.current.rotation.y += 0.001;
+    handsRef.current.forEach((hand, i) => {
+      hand.position.y += Math.sin(time + i) * 0.01;
+      hand.rotation.z += Math.cos(time + i) * 0.005;
+    });
+    cloudRef.current.children.forEach((cloud, i) => {
+      cloud.position.x += Math.sin(time + i) * 0.01;
+      cloud.position.z += Math.cos(time + i) * 0.01;
+    });
   });
-
-  // Cleanup Three.js objects
-  useEffect(() => {
-    return () => {
-      particles.geometry.dispose();
-      particles.material.dispose();
-      icons.forEach((icon) => {
-        icon.geometry.dispose();
-        icon.material.dispose();
-      });
-    };
-  }, [particles, icons]);
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <pointLight
-        ref={lightRef}
-        position={[1.5, 1.5, 1.5]}
-        intensity={2}
-        color={icons[0].material.color}
-        distance={6}
-        decay={1.5}
-      />
-      <primitive object={particles} />
-      {icons.map((icon, index) => (
-        <Float
-          key={index}
-          speed={3}
-          rotationIntensity={0.6}
-          floatIntensity={1.2}
-        >
-          <mesh
-            geometry={icon.geometry}
-            material={icon.material}
-            position={icon.position}
-            onPointerOver={() => setHovered(true)}
-            onPointerOut={() => setHovered(false)}
-            scale={hovered ? 1.3 : 1}
-          />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} />
+      <group ref={groupRef}>
+        <group ref={cloudRef} />
+        <Float speed={2} rotationIntensity={0.3} floatIntensity={0.5}>
+          <mesh>
+            <torusKnotGeometry args={[1.5, 0.4, 100, 16]} />
+            <meshStandardMaterial
+              color="#ffffff"
+              emissive="#ffffff"
+              emissiveIntensity={0.1}
+              transparent
+              opacity={0.15}
+              wireframe
+            />
+          </mesh>
         </Float>
-      ))}
-      <Text
-        fontSize={0.3}
-        color="#ffffff"
-        position={[0, 0.8, 0]}
-        anchorX="center"
-        anchorY="middle"
-      >
-        {category}
-        <meshStandardMaterial
-          emissive={icons[0].material.color}
-          emissiveIntensity={1.8}
-        />
-      </Text>
+      </group>
     </>
   );
-}
+};
 
 const campaigns = [
   {
     id: 1,
-    title: "Be hungry no more & Leave no one behind",
+    title: "End Hunger & Support Vulnerable Communities",
     category: "Food",
     raised: 86210,
     goal: 60000,
     image: "/hungry.jpeg",
-    color: "from-amber-500 to-amber-700",
+    color: "bg-gradient-to-br from-amber-400 to-amber-600",
   },
   {
     id: 2,
-    title: "Medical Health for People in Acute Need",
+    title: "Medical Care for Those in Critical Need",
     category: "Treatment",
     raised: 69628,
     goal: 60000,
     image: "/sick.jpeg",
-    color: "from-emerald-500 to-emerald-700",
+    color: "bg-gradient-to-br from-emerald-400 to-emerald-600",
   },
   {
     id: 3,
-    title: "Your Little Help Can Heal Their Hearts",
+    title: "Healing Hearts Through Compassion",
     category: "Development",
     raised: 40009,
     goal: 50000,
     image: "/heart.jpeg",
-    color: "from-blue-500 to-blue-700",
+    color: "bg-gradient-to-br from-blue-400 to-blue-600",
   },
   {
     id: 4,
-    title: "Education for Every Child",
+    title: "Education Access for All Children",
     category: "Education",
     raised: 75000,
     goal: 100000,
     image: "/educ.jpeg",
-    color: "from-purple-500 to-purple-700",
+    color: "bg-gradient-to-br from-purple-400 to-purple-600",
   },
   {
     id: 5,
-    title: "Sustainable Employment Programs",
+    title: "Creating Sustainable Job Opportunities",
     category: "Employment",
     raised: 58000,
     goal: 80000,
     image: "/vt.jpeg",
-    color: "from-indigo-500 to-indigo-700",
+    color: "bg-gradient-to-br from-indigo-400 to-indigo-600",
   },
   {
     id: 6,
-    title: "Protect Our Planet",
+    title: "Protecting Our Planet's Future",
     category: "Environment",
     raised: 32000,
     goal: 50000,
     image: "/pl.jpeg",
-    color: "from-green-500 to-green-700",
+    color: "bg-gradient-to-br from-green-400 to-green-600",
   },
 ];
 
 export default function CampaignSlider() {
+  const containerRef = useRef();
+
+  useEffect(() => {
+    gsap.from(containerRef.current, {
+      opacity: 0,
+      y: 50,
+      duration: 1,
+      scrollTrigger: {
+        trigger: containerRef.current,
+        start: "top 80%",
+        toggleActions: "play none none none",
+      },
+    });
+  }, []);
+
   return (
-    <div className="relative my-8 h-[600px] w-full overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Content */}
-      <div className="relative z-10 h-full flex flex-col justify-center px-4 sm:px-8">
-        <h2 className="text-3xl sm:text-4xl font-bold text-center text-white mb-8">
-          Our Current Campaigns
-        </h2>
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-300">
+      {/* Background Patterns */}
+      <div className="absolute inset-0 z-0 opacity-25 bg-[url('/dagger-map-pattern.png')] bg-cover"></div>
+      <div className="absolute inset-0 z-0 opacity-15 bg-[url('/wave-pattern.png')] bg-repeat"></div>
+      <div className="absolute inset-0 z-0 opacity-20">
+        <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+          <HandGivingScene />
+        </Canvas>
+      </div>
+
+      <div
+        ref={containerRef}
+        className="relative z-10 container mx-auto px-4 sm:px-8 py-16"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 font-serif animate-pulse">
+            Our Impactful Campaigns
+          </h2>
+          <p className="text-base sm:text-lg text-gray-700 max-w-2xl mx-auto font-sans">
+            Join us in making a difference through these vital initiatives
+          </p>
+        </motion.div>
 
         <Swiper
           modules={[Autoplay, Navigation]}
           spaceBetween={20}
           slidesPerView={1}
           breakpoints={{
-            640: { slidesPerView: 2, spaceBetween: 15 },
-            1024: { slidesPerView: 3, spaceBetween: 20 },
+            640: { slidesPerView: 1.5, spaceBetween: 15 },
+            1024: { slidesPerView: 2.5, spaceBetween: 20 },
+            1280: { slidesPerView: 3, spaceBetween: 20 },
           }}
           autoplay={{ delay: 4000, disableOnInteraction: false }}
-          navigation
+          navigation={{
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+          }}
           loop={true}
-          className="w-full max-w-6xl mx-auto"
+          centeredSlides={true}
+          className="w-full pb-12"
         >
-          {campaigns.map((campaign) => {
+          {campaigns.map((campaign, index) => {
             const percentage = Math.min(
               Math.round((campaign.raised / campaign.goal) * 100),
               100
             );
 
+            const cardSpring = useSpring({
+              from: { y: 25, opacity: 0 },
+              to: { y: 0, opacity: 1 },
+              config: { mass: 1, tension: 140, friction: 16 },
+              delay: index * 150,
+            });
+
             return (
               <SwiperSlide key={campaign.id}>
-                <div
-                  className={`relative bg-gradient-to-br ${campaign.color} p-2 rounded-2xl shadow-2xl h-[450px] transform perspective-1000 rotateX-5 rotateY-5 transition-transform duration-500 hover:rotateX-0 hover:rotateY-0 hover:scale-105 hover:shadow-3xl`}
+                <animated.div
+                  style={cardSpring}
+                  className="relative h-[480px] rounded-2xl overflow-hidden shadow-2xl bg-white/10 backdrop-blur-lg border-l-[6px] border-gold-400 ring-1 ring-gold-200/50 hover:ring-gold-300/50 transition-all duration-300"
                 >
-                  {/* 3D Background */}
+                  {/* Card Background Image */}
                   <div className="absolute inset-0 z-0">
-                    <Canvas camera={{ position: [0, 0, 2.5], fov: 45 }}>
-                      <CampaignScene
-                        category={campaign.category}
-                        hexColor={campaign.color
-                          .split(" ")[0]
-                          .replace("from-", "#")} // Pass hex color
-                      />
-                      <OrbitControls
-                        enableZoom={false}
-                        enablePan={false}
-                        autoRotate
-                        autoRotateSpeed={0.4}
-                      />
-                    </Canvas>
+                    <img
+                      src={campaign.image}
+                      alt={campaign.title}
+                      className="w-full h-full object-cover opacity-70"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                   </div>
 
-                  {/* Card Content */}
-                  <div className="relative h-full bg-white/20 backdrop-blur-md rounded-xl overflow-hidden border border-white/30">
-                    {/* Image */}
-                    <div className="absolute inset-0">
-                      <img
-                        src={campaign.image}
-                        alt={campaign.title}
-                        className="w-full h-full object-cover opacity-80"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                    </div>
+                  {/* Content */}
+                  <div className="relative z-10 h-full flex flex-col justify-end p-4 sm:p-6">
+                    <div className="bg-white/90 backdrop-blur-md rounded-lg p-4 sm:p-5 shadow-lg border-l-4 border-gold-400">
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider font-sans">
+                            {campaign.category}
+                          </span>
+                          <h3 className="text-base sm:text-lg font-bold text-gray-900 mt-1 line-clamp-2 font-serif">
+                            {campaign.title}
+                          </h3>
+                        </div>
+                        <div className="text-lg sm:text-xl font-bold text-gray-900">
+                          {percentage}%
+                        </div>
+                      </div>
 
-                    {/* Content */}
-                    <div className="relative h-full flex flex-col justify-end p-4">
-                      <div className="bg-white/85 backdrop-blur-sm rounded-lg p-4 shadow-lg border-l-4 border-white/50">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                              {campaign.category}
-                            </span>
-                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mt-1 line-clamp-2">
-                              {campaign.title}
-                            </h3>
-                          </div>
-                          <div className="text-2xl font-bold text-gray-900">
-                            {percentage}%
-                          </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                        <motion.div
+                          className={`h-2 rounded-full ${campaign.color}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percentage}%` }}
+                          transition={{ duration: 1.5, ease: "easeOut" }}
+                        />
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div className="text-xs sm:text-sm text-gray-700 font-sans">
+                          <span className="font-bold">
+                            ${campaign.raised.toLocaleString()}
+                          </span>
+                          <span className="mx-1">/</span>
+                          <span>${campaign.goal.toLocaleString()}</span>
                         </div>
 
-                        {/* Progress bar */}
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-                          <div
-                            className={`bg-gradient-to-r ${campaign.color} h-2 rounded-full transition-all duration-500`}
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
-                          <div className="text-xs text-gray-700">
-                            <span className="font-bold">
-                              Raised - ${campaign.raised.toLocaleString()}
-                            </span>
-                            <span className="mx-1">/</span>
-                            <span>
-                              Goal - ${campaign.goal.toLocaleString()}
-                            </span>
-                          </div>
-
-                          <button
-                            className={`px-4 py-1 bg-gradient-to-r ${campaign.color} text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105`}
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          className={`px-3 sm:px-4 py-1 ${campaign.color} text-white text-xs sm:text-sm font-bold rounded-full shadow-md hover:shadow-lg transition-all flex items-center`}
+                        >
+                          <span>Donate</span>
+                          <svg
+                            className="w-3 h-3 sm:w-4 sm:h-4 ml-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
                           >
-                            Donate Now
-                          </button>
-                        </div>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </motion.button>
                       </div>
                     </div>
                   </div>
-                </div>
+                </animated.div>
               </SwiperSlide>
             );
           })}
+          <div className="swiper-button-prev !text-gray-700 !left-4 after:!text-xl"></div>
+          <div className="swiper-button-next !text-gray-700 !right-4 after:!text-xl"></div>
         </Swiper>
       </div>
     </div>
