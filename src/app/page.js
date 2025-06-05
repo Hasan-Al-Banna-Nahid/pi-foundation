@@ -1,6 +1,4 @@
-
-
-// 💡 Non-blocking / fast render
+import AnimatedBanners from "./components/Banner/Banner";
 import AboutUsHero from "./components/About/About";
 import CampaignSlider from "./components/Campaign/Campaign";
 import SuccessStoryBanner from "./components/NeedHelp/NeedHelp";
