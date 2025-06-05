@@ -282,7 +282,7 @@ function BannerSlide({ title, subtitle, stats, buttons, type }) {
 
       {/* Cartoon SVG Animated Section */}
       <div className="relative z-20 w-full lg:w-1/2 h-64 lg:h-[80%] rounded-xl shadow-[0_0_20px_rgba(136,136,255,0.5)] overflow-hidden">
-        <Image fill quality={100} src="/smi.jpg" />
+        <Image fill quality={100} src="/sme.jpg" />
       </div>
     </div>
   );
