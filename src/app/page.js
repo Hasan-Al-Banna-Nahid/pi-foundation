@@ -13,7 +13,7 @@ export default function Home() {
       <AnimatedBanners />
       <Service />
       <AboutUsHero />
-      <VolunteerComponent />
+      {/* <VolunteerComponent /> */}
       <CampaignSlider />
       <OpenDoorsComponent />
       <CharityHero />
