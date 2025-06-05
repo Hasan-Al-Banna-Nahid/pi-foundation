@@ -2,6 +2,7 @@ import AboutUsHero from "./components/About/About";
 import AnimatedBanners from "./components/Banner/Banner";
 import CampaignSlider from "./components/Campaign/Campaign";
 import CharityHero from "./components/CharityHero/CharityHero";
+import SuccessStoryBanner from "./components/NeedHelp/NeedHelp";
 import OpenDoorsComponent from "./components/OpenDoor/OpenDoor";
 import Service from "./components/Service/Service";
 import SuccessStoryComponent from "./components/successStrory/successStrory";
@@ -17,6 +18,7 @@ export default function Home() {
       <CampaignSlider />
       <OpenDoorsComponent />
       <CharityHero />
+      <SuccessStoryBanner />
       <SuccessStoryComponent />
     </div>
   );
