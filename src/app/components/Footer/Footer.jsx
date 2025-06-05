@@ -205,7 +205,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 border-t border-purple-400/30 pt-6 text-center">
           <p className="text-purple-200 text-sm font-sans">
-            &copy; {new Date().getFullYear()} Humanist Services. All rights
+            &copy; {new Date().getFullYear()} Pi Foundation Services. All rights
             reserved.
           </p>
         </div>
