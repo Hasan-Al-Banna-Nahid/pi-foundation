@@ -222,7 +222,7 @@ export default function RecentProjects() {
     },
     {
       id: 3,
-      image: "/job.jpg",
+      image: "/job.JPG",
       title: "Employment",
       description: "Job Skills Training",
     },
