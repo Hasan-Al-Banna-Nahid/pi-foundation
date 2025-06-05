@@ -175,9 +175,9 @@ export default function Footer() {
               Contact Us
             </h3>
             <ul className="space-y-2 text-purple-200 text-sm font-sans">
-              <li>Email: info@example.com</li>
-              <li>Phone: +1 (123) 456-7890</li>
-              <li>Address: 1234 Street, City, Country</li>
+              <li>Email: IamNahid591998@gmail.com</li>
+              <li>Phone: +(880)1746432218</li>
+              <li>Address: Dhaka,Bangladesh</li>
             </ul>
           </div>
 

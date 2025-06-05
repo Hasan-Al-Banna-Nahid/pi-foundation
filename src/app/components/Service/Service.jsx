@@ -256,66 +256,69 @@ function ParticleBackground({ cardPositions }) {
 
 function ServiceCard({ theme, title, description, stats, buttonText, index }) {
   const gradientMap = {
-    treatment: "from-red-500 to-purple-700",
-    education: "from-green-500 to-blue-700",
-    unemployment: "from-yellow-500 to-orange-700",
-  };
-
-  const iconMap = {
-    treatment: "🩺",
-    education: "📚",
-    unemployment: "💼",
+    treatment: "from-red-600 via-purple-600 to-blue-700",
+    education: "from-green-600 via-teal-500 to-blue-600",
+    unemployment: "from-yellow-500 via-orange-600 to-red-600",
   };
 
   const cardProps = useSpring({
-    from: { y: 50, opacity: 0, scale: 0.85, rotateX: 15 },
+    from: { y: 60, opacity: 0, scale: 0.9, rotateX: 20 },
     to: { y: 0, opacity: 1, scale: 1, rotateX: 0 },
-    config: { mass: 1, tension: 180, friction: 20 },
-    delay: index * 250,
+    config: { mass: 1, tension: 200, friction: 18, bounce: 0.3 },
+    delay: index * 300,
+  });
+
+  const hoverProps = useSpring({
+    scale: 1,
+    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+    config: { tension: 300, friction: 10 },
   });
 
   return (
     <animated.div
       style={{
         ...cardProps,
+        ...hoverProps,
         transform: cardProps.rotateX.to(
-          (rx) => `perspective(1000px) rotateX(${rx}deg)`
+          (rx) => `perspective(1200px) rotateX(${rx}deg)`
         ),
+        zIndex: index + 1,
       }}
-      className="relative bg-gradient-to-br from-white/90 to-gray-100/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border-l-8 border-gold-500 ring-4 ring-gold-400/30 hover:ring-gold-500/60 transition-all duration-500 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,215,0,0.5)]"
+      className={`relative bg-gradient-to-br from-white/95 to-gray-200/85 backdrop-blur-2xl rounded-3xl overflow-hidden border-l-8 border-gradient-to-r ${gradientMap[theme]} ring-4 ring-gray-300/30 hover:ring-gradient-to-r ${gradientMap[theme]} transition-all duration-500 hover:shadow-[0_15px_40px_rgba(0,0,0,0.3)] lg:-mr-4 lg:ml-4 group`}
+      onMouseEnter={() => hoverProps.scale.set(1.05)}
+      onMouseLeave={() => hoverProps.scale.set(1)}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-gold-200/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-700"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
       <div className="relative p-6 sm:p-8">
-        <div className="text-5xl sm:text-6xl mb-5 text-gold-500 animate-pulse">
-          {iconMap[theme]}
-        </div>
-        <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 tracking-tight font-serif">
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3 tracking-tight font-[Inter,ui-sans-serif,system-ui]">
           {title}
         </h3>
-        <p className="text-gray-800 text-base sm:text-lg mb-6 font-sans leading-relaxed">
+        <p className="text-gray-800 text-base sm:text-lg mb-6 font-[Inter,ui-sans-serif,system-ui] leading-relaxed">
           {description}
         </p>
 
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        {/* <div className="grid grid-cols-2 gap-4 mb-6">
           {stats.map((stat, idx) => (
             <div
               key={idx}
-              className="bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-inner"
+              className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-inner border border-gray-200/50"
             >
-              <p className="text-lg sm:text-xl font-bold text-gold-600">
+              <p className="text-lg sm:text-xl font-bold text-gray-900">
                 {stat.value}
               </p>
-              <p className="text-sm text-gray-700 font-sans">{stat.label}</p>
+              <p className="text-sm text-gray-600 font-[Inter,ui-sans-serif,system-ui]">
+                {stat.label}
+              </p>
             </div>
           ))}
-        </div>
+        </div> */}
 
         <button
-          className={`bg-gradient-to-r ${gradientMap[theme]} text-white px-6 sm:px-8 py-3 rounded-full font-bold text-base sm:text-lg hover:opacity-85 transition-all transform hover:scale-110 shadow-lg font-sans flex items-center justify-center gap-3 w-full`}
+          className={`bg-gradient-to-r ${gradientMap[theme]} text-white px-6 sm:px-8 py-3 rounded-full font-bold text-base sm:text-lg transition-all transform hover:scale-105 shadow-lg font-[Inter,ui-sans-serif,system-ui] flex items-center justify-center gap-3 w-full group-hover:shadow-[0_8px_20px_rgba(0,0,0,0.2)]`}
         >
           {buttonText}
           <svg
-            className="w-5 h-5"
+            className="w-5 h-5 transform group-hover:translate-x-1 transition-transform"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -340,10 +343,10 @@ export default function HumanistServices() {
       title: "Medical Treatment",
       description:
         "Providing life-saving treatments to those in critical need with our network of healthcare professionals.",
-      stats: [
-        { value: "10K+", label: "Patients Treated" },
-        { value: "24/7", label: "Care Available" },
-      ],
+      // stats: [
+      //   { value: "10K+", label: "Patients Treated" },
+      //   { value: "24/7", label: "Care Available" },
+      // ],
       buttonText: "Support Healthcare",
     },
     {
@@ -351,10 +354,10 @@ export default function HumanistServices() {
       title: "Quality Education",
       description:
         "Building schools and providing learning resources to underserved communities worldwide.",
-      stats: [
-        { value: "50+", label: "Schools Built" },
-        { value: "5K+", label: "Children Helped" },
-      ],
+      // stats: [
+      //   { value: "50+", label: "Schools Built" },
+      //   { value: "5K+", label: "Children Helped" },
+      // ],
       buttonText: "Fund Education",
     },
     {
@@ -362,10 +365,10 @@ export default function HumanistServices() {
       title: "Job Opportunities",
       description:
         "Empowering individuals with vocational training and employment placement services.",
-      stats: [
-        { value: "85%", label: "Employment Rate" },
-        { value: "2K+", label: "People Trained" },
-      ],
+      // stats: [
+      //   { value: "85%", label: "Employment Rate" },
+      //   { value: "2K+", label: "People Trained" },
+      // ],
       buttonText: "Create Jobs",
     },
   ];
@@ -397,33 +400,34 @@ export default function HumanistServices() {
 
       <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <animated.div style={textProps} className="text-center mb-12 sm:mb-16">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-4 tracking-tight font-serif animate-glow">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-4 tracking-tight font-[Inter,ui-sans-serif,system-ui] animate-glow">
             We Do It For All People
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-800 max-w-3xl mx-auto leading-relaxed font-sans">
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-800 max-w-3xl mx-auto leading-relaxed font-[Inter,ui-sans-serif,system-ui]">
             Humanist Services is dedicated to creating positive change through
             compassion, action, and community empowerment.
           </p>
         </animated.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 relative">
           {services.map((service, index) => (
             <ServiceCard key={index} {...service} index={index} />
           ))}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-300/20 to-transparent h-1 top-1/2 transform -translate-y-1/2 hidden lg:block"></div>
         </div>
 
         <animated.div
           style={textProps}
-          className="mt-16 sm:mt-24 bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl p-8 sm:p-10 max-w-4xl mx-auto border-l-6 border-gold-500"
+          className="mt-16 sm:mt-24 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl p-8 sm:p-10 max-w-4xl mx-auto border-l-6 border-gradient-to-r from-purple-600 to-blue-700"
         >
           <blockquote className="text-center relative">
-            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-5xl text-gold-400 opacity-60">
+            <span className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-5xl text-purple-400 opacity-60">
               “
             </span>
-            <p className="text-xl sm:text-2xl italic text-gray-900 mb-4 font-medium font-serif">
+            <p className="text-xl sm:text-2xl italic text-gray-900 mb-4 font-medium font-[Inter,ui-sans-serif,system-ui]">
               "Together We Can Make Changes"
             </p>
-            <footer className="text-gray-800 text-base sm:text-lg font-sans">
+            <footer className="text-gray-800 text-base sm:text-lg font-[Inter,ui-sans-serif,system-ui]">
               — Hasan Al Banna Nahid, Founder, Pi Foundation
             </footer>
           </blockquote>
@@ -431,13 +435,13 @@ export default function HumanistServices() {
 
         <animated.div
           style={textProps}
-          className="mt-12 sm:mt-16 text-center bg-gradient-to-br from-purple-500/15 to-blue-900/15 backdrop-blur-xl rounded-3xl p-8 sm:p-10"
+          className="mt-12 sm:mt-16 text-center bg-gradient-to-br from-purple-500/20 to-blue-900/20 backdrop-blur-2xl rounded-3xl p-8 sm:p-10"
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight font-serif">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 tracking-tight font-[Inter,ui-sans-serif,system-ui]">
             Join Us in Making a Difference
           </h2>
           <div className="flex flex-col sm:flex-row justify-center gap-6 sm:gap-8">
-            <button className="bg-gradient-to-r from-purple-600 to-blue-800 text-white px-8 sm:px-10 py-4 rounded-full font-bold text-base sm:text-lg hover:opacity-85 transition-all transform hover:scale-110 shadow-lg font-sans flex items-center justify-center gap-3">
+            {/* <button className="bg-gradient-to-r from-purple-600 to-blue-800 text-white px-8 sm:px-10 py-4 rounded-full font-bold text-base sm:text-lg hover:opacity-85 transition-all transform hover:scale-110 shadow-lg font-[Inter,ui-sans-serif,system-ui] flex items-center justify-center gap-3">
               Become a Volunteer
               <svg
                 className="w-5 h-5"
@@ -452,8 +456,8 @@ export default function HumanistServices() {
                   d="M9 5l7 7-7 7"
                 />
               </svg>
-            </button>
-            <button className="bg-gradient-to-r from-purple-600 to-blue-800 text-white px-8 sm:px-10 py-4 rounded-full font-bold text-base sm:text-lg hover:opacity-85 transition-all transform hover:scale-110 shadow-lg font-sans flex items-center justify-center gap-3">
+            </button> */}
+            <button className="bg-gradient-to-r from-purple-600 to-blue-800 text-white px-8 sm:px-10 py-4 rounded-full font-bold text-base sm:text-lg hover:opacity-85 transition-all transform hover:scale-110 shadow-lg font-[Inter,ui-sans-serif,system-ui] flex items-center justify-center gap-3">
               Make a Donation
               <svg
                 className="w-5 h-5"

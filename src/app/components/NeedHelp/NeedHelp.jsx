@@ -3,127 +3,117 @@ import { useRef, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Float } from "@react-three/drei";
 import * as THREE from "three";
-import { useSpring, animated } from "@react-spring/web"; // Changed to @react-spring/web for DOM animations
+import { useSpring, animated } from "@react-spring/web";
 import { gsap } from "gsap";
 import Image from "next/image";
 
-function FloatingParticles() {
-  const particlesRef = useRef(null);
-  const torusRef = useRef(null);
-  const count = 200;
-  const mouse = useRef({ x: 0, y: 0 });
+function HumanFiguresBackground() {
+  const groupRef = useRef(null);
+  const figuresRef = useRef(null);
+  const count = 50; // Number of human figures
+  const positions = useRef(new Float32Array(count * 3));
   const velocities = useRef(new Float32Array(count * 3));
-  const originalPositions = useRef(new Float32Array(count * 3));
 
   useEffect(() => {
-    const particles = particlesRef.current;
-    if (!particles) return;
+    if (!figuresRef.current) return;
 
-    // Create and assign geometry
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 10;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 10;
-      originalPositions.current[i * 3] = positions[i * 3];
-      originalPositions.current[i * 3 + 1] = positions[i * 3 + 1];
-      originalPositions.current[i * 3 + 2] = positions[i * 3 + 2];
-
-      colors[i * 3] = 0.1 + Math.random() * 0.2;
-      colors[i * 3 + 1] = 0.5 + Math.random() * 0.3;
-      colors[i * 3 + 2] = 0.1 + Math.random() * 0.2;
-    }
-
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-    particles.geometry = geometry; // Assign geometry to the points object
-
-    const onMouseMove = (event) => {
-      mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    };
-    window.addEventListener("mousemove", onMouseMove);
-    return () => window.removeEventListener("mousemove", onMouseMove);
-  }, []);
-
-  useFrame((state, delta) => {
-    const particles = particlesRef.current;
-    if (!particles || !particles.geometry?.attributes?.position) return; // Safety check
-    const positions = particles.geometry.attributes.position.array;
-
+    // Initialize human figures in a circular pattern
+    const matrices = new Float32Array(count * 16); // For instanced mesh matrices
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
-      const x = positions[i3];
-      const y = positions[i3 + 1];
-      const z = positions[i3 + 2];
+      const angle = (i / count) * Math.PI * 2;
+      const radius = 6 + Math.random() * 2; // Spread figures in a ring
+      const x = Math.cos(angle) * radius;
+      const y = (Math.random() - 0.5) * 4; // Vertical spread
+      const z = Math.sin(angle) * radius;
+      positions.current[i3] = x;
+      positions.current[i3 + 1] = y;
+      positions.current[i3 + 2] = z;
 
-      const k = 0.08;
-      const damping = 0.92;
-      const ox = originalPositions.current[i3];
-      const oy = originalPositions.current[i3 + 1];
-      const oz = originalPositions.current[i3 + 2];
+      // Random walking direction
+      velocities.current[i3] = (Math.random() - 0.5) * 0.2;
+      velocities.current[i3 + 1] = 0;
+      velocities.current[i3 + 2] = (Math.random() - 0.5) * 0.2;
 
-      const ax = -k * (x - ox);
-      const ay =
-        -k * (y - oy) + Math.sin(state.clock.getElapsedTime() + i) * 0.01;
-      const az = -k * (z - oz);
-
-      velocities.current[i3] += ax * delta;
-      velocities.current[i3 + 1] += ay * delta;
-      velocities.current[i3 + 2] += az * delta;
-
-      velocities.current[i3] *= damping;
-      velocities.current[i3 + 1] *= damping;
-      velocities.current[i3 + 2] *= damping;
-
-      const mouseWorld = new THREE.Vector3(
-        mouse.current.x * 5,
-        mouse.current.y * 5,
-        0
-      );
-      const distance = Math.sqrt(
-        (x - mouseWorld.x) ** 2 + (y - mouseWorld.y) ** 2 + z ** 2
-      );
-      if (distance < 1) {
-        const force = (1 - distance) * 0.15;
-        velocities.current[i3] += force * (x - mouseWorld.x) * delta;
-        velocities.current[i3 + 1] += force * (y - mouseWorld.y) * delta;
-      }
-
-      positions[i3] += velocities.current[i3] * delta;
-      positions[i3 + 1] += velocities.current[i3 + 1] * delta;
-      positions[i3 + 2] += velocities.current[i3 + 2] * delta;
+      // Set instanced matrix
+      const matrix = new THREE.Matrix4();
+      matrix.setPosition(x, y, z);
+      matrix.scale(new THREE.Vector3(0.3, 0.6, 0.3)); // Scale for human-like proportions
+      matrix.toArray(matrices, i * 16);
     }
 
-    particles.geometry.attributes.position.needsUpdate = true;
-    particles.rotation.y += delta * 0.02;
+    figuresRef.current.instanceMatrix = new THREE.InstancedBufferAttribute(
+      matrices,
+      16
+    );
+    figuresRef.current.instanceMatrix.needsUpdate = true;
+
+    return () => {
+      figuresRef.current.geometry.dispose();
+      figuresRef.current.material.dispose();
+    };
+  }, []);
+
+  useFrame(({ clock }) => {
+    const time = clock.getElapsedTime();
+    if (figuresRef.current) {
+      for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        const matrix = new THREE.Matrix4();
+
+        // Update positions with walking motion
+        positions.current[i3] += velocities.current[i3] * 0.016;
+        positions.current[i3 + 2] += velocities.current[i3 + 2] * 0.016;
+
+        // Keep figures within bounds (circular path)
+        const distance = Math.sqrt(
+          positions.current[i3] ** 2 + positions.current[i3 + 2] ** 2
+        );
+        if (distance > 8) {
+          const angle = Math.atan2(
+            positions.current[i3 + 2],
+            positions.current[i3]
+          );
+          positions.current[i3] = Math.cos(angle) * 7;
+          positions.current[i3 + 2] = Math.sin(angle) * 7;
+        }
+
+        // Add bobbing and waving motion
+        const y = positions.current[i3 + 1] + Math.sin(time * 2 + i) * 0.1;
+        matrix.setPosition(positions.current[i3], y, positions.current[i3 + 2]);
+
+        // Add slight rotation for liveliness
+        matrix.multiply(
+          new THREE.Matrix4().makeRotationY(Math.sin(time + i) * 0.2)
+        );
+        matrix.scale(new THREE.Vector3(0.3, 0.6, 0.3));
+
+        figuresRef.current.setMatrixAt(i, matrix);
+      }
+      figuresRef.current.instanceMatrix.needsUpdate = true;
+    }
+    if (groupRef.current) {
+      groupRef.current.rotation.y += 0.01; // Gentle rotation of the entire group
+    }
   });
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[5, 5, 5]} intensity={1.5} />
-      <group>
-        <points ref={particlesRef}>
-          <bufferGeometry />{" "}
-          {/* Removed attach="geometry" as it's now set in useEffect */}
-        </points>
-        <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.3}>
-          <mesh ref={torusRef}>
-            <torusKnotGeometry args={[1.2, 0.2, 80, 16]} />
-            <meshStandardMaterial
-              color="#FFD700"
-              emissive="#FFD700"
-              emissiveIntensity={0.2}
-              transparent
-              opacity={0.1}
-              wireframe
-            />
-          </mesh>
-        </Float>
+      <ambientLight intensity={0.6} color="#aaffcc" />
+      <pointLight position={[5, 5, 5]} intensity={1.5} color="#ffffff" />
+      <pointLight position={[-5, -5, 5]} intensity={1} color="#88ccff" />
+      <group ref={groupRef}>
+        <instancedMesh ref={figuresRef} args={[null, null, count]}>
+          <cylinderGeometry args={[0.5, 0.5, 2, 16]} />{" "}
+          {/* Simplified human shape */}
+          <meshStandardMaterial
+            color="#66cc99"
+            emissive="#66cc99"
+            emissiveIntensity={0.5}
+            transparent
+            opacity={0.7}
+          />
+        </instancedMesh>
       </group>
     </>
   );
@@ -179,7 +169,6 @@ export default function SuccessStoryBanner({
   });
 
   const handlePlayClick = () => {
-    // Fallback to redirect if Modal isn't available
     window.open(youtubeUrl, "_blank");
   };
 
@@ -188,12 +177,10 @@ export default function SuccessStoryBanner({
       ref={bannerRef}
       className="relative w-full min-h-[600px] lg:min-h-[400px] bg-gradient-to-br from-green-900 to-teal-900 overflow-hidden rounded-lg shadow-2xl"
     >
-      {/* Background Patterns */}
-      <div className="absolute inset-0 z-0 opacity-20 bg-[url('/dagger-map-pattern.png')] bg-cover"></div>
-      <div className="absolute inset-0 z-0 opacity-10 bg-[url('/wave-pattern.png')] bg-repeat"></div>
-      <div className="absolute inset-0 z-10 opacity-15">
-        <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
-          <FloatingParticles />
+      {/* Animated Human Figures Background */}
+      <div className="absolute inset-0 z-10 opacity-25">
+        <Canvas camera={{ position: [0, 0, 15], fov: 60 }}>
+          <HumanFiguresBackground />
           <OrbitControls
             enableZoom={false}
             enablePan={false}
@@ -243,7 +230,7 @@ export default function SuccessStoryBanner({
         {/* Right Section - Image and Play Button */}
         <div className="relative flex items-center justify-center">
           <Image
-            src="/success-story-bg.jpg"
+            src="/gd.webp"
             alt="Success story"
             width={800}
             height={400}

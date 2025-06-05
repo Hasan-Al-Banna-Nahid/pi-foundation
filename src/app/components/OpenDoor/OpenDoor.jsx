@@ -118,10 +118,8 @@ function BackgroundScene() {
     }
   });
 
-  // Return null if particles aren't created yet
   if (!particlesRef.current) return null;
 
-  // Properly pass the object to primitive
   return <primitive object={particlesRef.current} />;
 }
 
@@ -131,8 +129,13 @@ export default function VolunteerPage() {
   const containerRef = useRef();
 
   useEffect(() => {
+    // Filter out undefined refs
+    const validRefs = [leftCardRef.current, rightCardRef.current].filter(
+      (ref) => ref !== undefined
+    );
+
     // Card animations
-    gsap.from([leftCardRef.current, rightCardRef.current], {
+    gsap.from(validRefs, {
       y: 50,
       opacity: 0,
       duration: 1,
@@ -144,32 +147,28 @@ export default function VolunteerPage() {
       },
     });
 
-    // Floating effect
-    gsap.to(leftCardRef.current, {
-      y: 10,
-      duration: 3,
-      yoyo: true,
-      repeat: -1,
-      ease: "sine.inOut",
-    });
-
-    gsap.to(rightCardRef.current, {
-      y: -10,
-      duration: 3,
-      yoyo: true,
-      repeat: -1,
-      ease: "sine.inOut",
-      delay: 0.5,
-    });
+    // Floating effect for rightCardRef
+    if (rightCardRef.current) {
+      gsap.to(rightCardRef.current, {
+        y: -10,
+        duration: 3,
+        yoyo: true,
+        repeat: -1,
+        ease: "sine.inOut",
+        delay: 0.5,
+      });
+    }
 
     // Background animation
-    gsap.to(containerRef.current, {
-      backgroundPosition: "100% 50%",
-      duration: 15,
-      repeat: -1,
-      yoyo: true,
-      ease: "none",
-    });
+    if (containerRef.current) {
+      gsap.to(containerRef.current, {
+        backgroundPosition: "100% 50%",
+        duration: 15,
+        repeat: -1,
+        yoyo: true,
+        ease: "none",
+      });
+    }
   }, []);
 
   return (
@@ -218,9 +217,9 @@ export default function VolunteerPage() {
           Together we can make a difference in people's lives
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-6xl">
-          {/* Volunteer Card */}
-          <div
+        <div className="grid grid-cols-1 lg:grid-cols-1 mx-auto gap-8 w-full max-w-6xl">
+          {/* Volunteer Card (Commented Out) */}
+          {/* <div
             ref={leftCardRef}
             className="relative bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border-2 border-white/20 p-8 shadow-2xl"
           >
@@ -263,7 +262,7 @@ export default function VolunteerPage() {
                 Sign Up to Volunteer
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* Donor Card */}
           <div
