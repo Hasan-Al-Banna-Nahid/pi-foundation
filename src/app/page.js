@@ -3,9 +3,10 @@ import AnimatedBanners from "./components/Banner/Banner";
 import CampaignSlider from "./components/Campaign/Campaign";
 import CharityHero from "./components/CharityHero/CharityHero";
 import SuccessStoryBanner from "./components/NeedHelp/NeedHelp";
-import OpenDoorsComponent from "./components/OpenDoor/OpenDoor";
-import Service from "./components/Service/Service";
 import SuccessStoryComponent from "./components/successStrory/successStrory";
+import OpenDoorsComponent from "./components/OpenDoor/OpenDoor";
+import RecentProjects from "./components/RecentProgramm/RecentProgramm";
+import Service from "./components/Service/Service";
 import VolunteerComponent from "./components/VolunteerScene/VolunteerScene";
 
 export default function Home() {
@@ -19,7 +20,9 @@ export default function Home() {
       <OpenDoorsComponent />
       <CharityHero />
       <SuccessStoryBanner />
+      {/* <RecentProjects /> */}
       <SuccessStoryComponent />
+      <RecentProjects />
     </div>
   );
 }

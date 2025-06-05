@@ -3,15 +3,13 @@ import { useRef, useEffect, useState } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Float } from "@react-three/drei";
 import * as THREE from "three";
-import { useSpring, animated } from "@react-spring/three";
+import { useSpring, animated } from "@react-spring/web"; // Changed to @react-spring/web for DOM animations
 import { gsap } from "gsap";
 import Image from "next/image";
-import { Modal } from "react-responsive-modal";
-import "react-responsive-modal/styles.css";
 
 function FloatingParticles() {
-  const particlesRef = useRef();
-  const torusRef = useRef();
+  const particlesRef = useRef(null);
+  const torusRef = useRef(null);
   const count = 200;
   const mouse = useRef({ x: 0, y: 0 });
   const velocities = useRef(new Float32Array(count * 3));
@@ -19,6 +17,10 @@ function FloatingParticles() {
 
   useEffect(() => {
     const particles = particlesRef.current;
+    if (!particles) return;
+
+    // Create and assign geometry
+    const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
@@ -35,14 +37,9 @@ function FloatingParticles() {
       colors[i * 3 + 2] = 0.1 + Math.random() * 0.2;
     }
 
-    particles.geometry.setAttribute(
-      "position",
-      new THREE.BufferAttribute(positions, 3)
-    );
-    particles.geometry.setAttribute(
-      "color",
-      new THREE.BufferAttribute(colors, 3)
-    );
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    particles.geometry = geometry; // Assign geometry to the points object
 
     const onMouseMove = (event) => {
       mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -54,6 +51,7 @@ function FloatingParticles() {
 
   useFrame((state, delta) => {
     const particles = particlesRef.current;
+    if (!particles || !particles.geometry?.attributes?.position) return; // Safety check
     const positions = particles.geometry.attributes.position.array;
 
     for (let i = 0; i < count; i++) {
@@ -110,15 +108,8 @@ function FloatingParticles() {
       <pointLight position={[5, 5, 5]} intensity={1.5} />
       <group>
         <points ref={particlesRef}>
-          <bufferGeometry attach="geometry" />
-          <pointsMaterial
-            attach="material"
-            size={0.03}
-            sizeAttenuation={true}
-            vertexColors
-            transparent
-            opacity={0.7}
-          />
+          <bufferGeometry />{" "}
+          {/* Removed attach="geometry" as it's now set in useEffect */}
         </points>
         <Float speed={0.8} rotationIntensity={0.3} floatIntensity={0.3}>
           <mesh ref={torusRef}>
@@ -187,6 +178,11 @@ export default function SuccessStoryBanner({
     delay: 400,
   });
 
+  const handlePlayClick = () => {
+    // Fallback to redirect if Modal isn't available
+    window.open(youtubeUrl, "_blank");
+  };
+
   return (
     <div
       ref={bannerRef}
@@ -253,13 +249,13 @@ export default function SuccessStoryBanner({
             height={400}
             className="object-cover rounded-lg shadow-lg"
             onError={(e) => {
-              e.target.src = "/fallback-bg.jpg"; // Fallback image
+              e.target.src = "/fallback-bg.jpg";
             }}
           />
           <animated.div
             style={playButtonProps}
             className="absolute flex items-center justify-center w-16 h-16 bg-white rounded-full cursor-pointer hover:bg-gray-100 transition-all duration-300"
-            onClick={() => setIsModalOpen(true)}
+            onClick={handlePlayClick}
             aria-label="Play success story video"
           >
             <svg
@@ -272,19 +268,6 @@ export default function SuccessStoryBanner({
           </animated.div>
         </div>
       </div>
-
-      {/* Modal for YouTube Video */}
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} center>
-        <iframe
-          width="560"
-          height="315"
-          src={`${youtubeUrl}?autoplay=1`}
-          title="YouTube video player"
-          frameBorder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-        ></iframe>
-      </Modal>
     </div>
   );
 }
