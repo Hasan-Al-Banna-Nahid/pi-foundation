@@ -1,25 +1,4 @@
-import dynamic from "next/dynamic";
 
-// 💡 Dynamically loaded (animation-heavy or big assets)
-const AnimatedBanners = dynamic(() => import("./components/Banner/Banner"), {
-  ssr: false,
-});
-const CharityHero = dynamic(
-  () => import("./components/CharityHero/CharityHero"),
-  { ssr: false }
-);
-const VolunteerComponent = dynamic(
-  () => import("./components/VolunteerScene/VolunteerScene"),
-  { ssr: false }
-);
-const SuccessStoryComponent = dynamic(
-  () => import("./components/successStrory/successStrory"),
-  { ssr: false }
-);
-const OpenDoorsComponent = dynamic(
-  () => import("./components/OpenDoor/OpenDoor"),
-  { ssr: false }
-);
 
 // 💡 Non-blocking / fast render
 import AboutUsHero from "./components/About/About";
